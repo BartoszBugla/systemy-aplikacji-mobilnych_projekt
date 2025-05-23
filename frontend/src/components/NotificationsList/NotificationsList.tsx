@@ -1,12 +1,13 @@
 import { useGetNotifications } from "@/lib/api/notification";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { NotificationItem } from "./NotificationListItem";
-import { Accordion } from "../ui/accordion";
+import { useTranslation } from "react-i18next";
 
 export type NotificationsListProps = React.ComponentProps<typeof Popover>;
 
 export const NotificationsList = ({ children }: NotificationsListProps) => {
   const { data } = useGetNotifications();
+  const { t } = useTranslation();
 
   return (
     <Popover>
@@ -18,7 +19,7 @@ export const NotificationsList = ({ children }: NotificationsListProps) => {
 
         {data?.data.length === 0 && (
           <div className="text-center text-sm text-muted-foreground">
-            Brak powiadomień
+            {t("notifications.empty")}
           </div>
         )}
       </PopoverContent>

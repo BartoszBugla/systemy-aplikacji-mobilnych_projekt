@@ -7,15 +7,37 @@ import {
   DrawerTrigger,
 } from "../ui/drawer";
 import { TransactionForm } from "./TransactionForm";
+import { useState, type JSX } from "react";
 
-export type TransactionFormDrawerProps = React.ComponentProps<typeof Drawer>;
+export type TransactionFormDrawerProps = React.ComponentProps<typeof Drawer> & {
+  CustomComponent?: JSX.Element;
+};
 
 export const TransactionFormDrawer = ({
   children,
+  CustomComponent,
   ...props
 }: TransactionFormDrawerProps) => {
+  const [isOpen, onOpenChange] = useState(false);
+
+  const handleClose = () => {
+    if (isOpen) {
+      onOpenChange(false);
+    }
+  };
+  const handleOpen = () => {
+    if (!isOpen) {
+      onOpenChange(true);
+    }
+  };
+
   return (
-    <Drawer {...props} direction="right">
+    <Drawer
+      {...props}
+      direction="right"
+      onOpenChange={handleOpen}
+      open={isOpen}
+    >
       <DrawerTrigger asChild>{children}</DrawerTrigger>
       <DrawerContent className="p-4">
         <DrawerClose className="absolute right-4 top-4">
@@ -24,7 +46,7 @@ export const TransactionFormDrawer = ({
           </Button>
         </DrawerClose>
 
-        <TransactionForm />
+        {CustomComponent || <TransactionForm onSubmit={handleClose} />}
       </DrawerContent>
     </Drawer>
   );

@@ -54,19 +54,20 @@ const SortingHeader = ({ column, label }: SortingHeaderProps) => {
 export const useTransactionListColumns =
   (): ColumnDef<TransactionResponse>[] => {
     const { data } = useGetMe();
+    const { t } = useTranslation();
 
     return [
       {
         accessorKey: "description",
         header: ({ column }) => (
-          <SortingHeader label="Description" column={column} />
+          <SortingHeader label={t("form.description")} column={column} />
         ),
       },
 
       {
         accessorKey: "amount",
         header: ({ column }) => (
-          <SortingHeader label="Amount" column={column} />
+          <SortingHeader label={t("form.amount")} column={column} />
         ),
         cell: ({ row }) => {
           const amount = row.original.amount;
@@ -90,7 +91,9 @@ export const useTransactionListColumns =
 
       {
         accessorKey: "createdAt",
-        header: ({ column }) => <SortingHeader label="Date" column={column} />,
+        header: ({ column }) => (
+          <SortingHeader label={t("transactionList.date")} column={column} />
+        ),
         cell: ({ row }) => {
           const date = new Date(row.getValue("createdAt"));
 
@@ -100,6 +103,16 @@ export const useTransactionListColumns =
             day: "2-digit",
           });
         },
+      },
+
+      {
+        accessorKey: "secondAccountEmail",
+        header: ({ column }) => (
+          <SortingHeader
+            label={t("transactionList.receiverSender")}
+            column={column}
+          />
+        ),
       },
     ];
   };
@@ -150,7 +163,7 @@ export const TransactionList = (props: TransactionListProps) => {
         />
       </div>
       <div className="font-bold text-2xl w-full border-t border-border">
-        Lista Transakcji
+        {t("transactionList.title")}
       </div>
       <div className="flex-1">
         <Table>

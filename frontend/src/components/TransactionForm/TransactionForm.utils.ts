@@ -4,6 +4,7 @@ import {
   TransactionType,
 } from "@/lib/api";
 import { useCreateTransaction } from "@/lib/api/transaction";
+import { useGetMe } from "@/lib/api/user";
 import { useForm } from "@tanstack/react-form";
 import { useTranslation } from "react-i18next";
 
@@ -16,10 +17,13 @@ export enum TransactionFormField {
   Description = "description",
   Category = "category",
   accountReceiver = "accountReceiver",
-  AccountSender = "accountSender",
+  SecondUserEmail = "secondUserEmail",
 }
 
-export const createValidatorSchema = (t: (key: string) => string) =>
+export const createValidatorSchema = (
+  t: (key: string) => string,
+  currentUserEmail?: string
+) =>
   z.object({
     [TransactionFormField.Amount]: z.coerce
       .number()
@@ -30,9 +34,13 @@ export const createValidatorSchema = (t: (key: string) => string) =>
       .string()
       .min(1, t("validation.descriptionRequired")),
     [TransactionFormField.Category]: z.nativeEnum(TransactionCategory),
-    [TransactionFormField.accountReceiver]: z
+    [TransactionFormField.accountReceiver]: z.string().optional(),
+    [TransactionFormField.SecondUserEmail]: z
       .string()
-      .min(1, t("validation.receiverRequired")),
+      .refine((value) => !currentUserEmail || value !== currentUserEmail, {
+        message: t("validation.secondUserEmail"),
+      })
+      .optional(),
   });
 
 export type FormValues = z.infer<ReturnType<typeof createValidatorSchema>>;
@@ -44,11 +52,14 @@ const defaultFormValues = {
   [TransactionFormField.Description]: "",
   [TransactionFormField.Category]: TransactionCategory.Food,
   [TransactionFormField.accountReceiver]: "",
+  [TransactionFormField.SecondUserEmail]: "",
 };
 
-export const useTransactionForm = () => {
+export const useTransactionForm = (externalOnSubmit: () => void) => {
   const { mutate } = useCreateTransaction();
   const { t } = useTranslation();
+
+  const { data: currentUser } = useGetMe();
 
   const handleSubmit = ({
     accountReceiver,
@@ -57,6 +68,7 @@ export const useTransactionForm = () => {
     currency,
     description,
     type,
+    secondUserEmail,
   }: FormValues) => {
     mutate({
       accountReceiver,
@@ -65,7 +77,10 @@ export const useTransactionForm = () => {
       currency,
       description,
       type,
+      secondUserEmail,
     });
+
+    externalOnSubmit();
   };
 
   const form = useForm({
@@ -77,7 +92,7 @@ export const useTransactionForm = () => {
       console.error("Form submission error", error);
     },
     validators: {
-      onSubmit: createValidatorSchema(t),
+      onSubmit: createValidatorSchema(t, currentUser?.email) as any,
     },
   });
 
@@ -115,7 +130,7 @@ export const useCategoryOptions = () => {
 export const useCurrencyOptions = () => {
   const { t } = useTranslation();
   return [
-    { value: TransactionCurrency.EUR, label: t("transaction.currencies.eur") },
+    // { value: TransactionCurrency.EUR, label: t("transaction.currencies.eur") },
     { value: TransactionCurrency.USD, label: t("transaction.currencies.usd") },
   ];
 };

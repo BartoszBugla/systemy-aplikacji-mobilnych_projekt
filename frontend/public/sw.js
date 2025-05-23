@@ -24,7 +24,6 @@ self.addEventListener("push", function (event) {
 
   const promiseChain = self.registration.showNotification(data.title, {
     body: data.message,
-    badge: "/icon-48x48.png",
     icon: "/icon-48x48.png",
   });
 

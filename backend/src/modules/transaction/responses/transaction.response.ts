@@ -4,6 +4,7 @@ import { TransactionDocument } from '../schemas/transaction.schema';
 import { TransactionType } from 'src/common/enums/transaction-type.enum';
 import { TransactionCategory } from 'src/common/enums/transaction-category.enum';
 import { TransactionCurrency } from 'src/common/enums/transaction-currency.enum';
+import { UserDocument } from 'src/modules/user/schemas/user.schema';
 
 export class TransactionResponse {
   @ApiProperty()
@@ -29,10 +30,18 @@ export class TransactionResponse {
   createdAt: Date;
   @ApiProperty()
   updatedAt: Date;
+
+  @ApiProperty()
+  secondAccountEmail: string;
+
   @ApiProperty()
   __v: number;
 
   static mapFromDoc(item: TransactionDocument): TransactionResponse {
-    return item.toObject();
+    return {
+      ...item.toObject(),
+      secondAccountEmail:
+        item.secondUserEmail || (item.accountReceiver as UserDocument).email,
+    } as TransactionResponse;
   }
 }

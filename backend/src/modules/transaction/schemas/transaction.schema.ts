@@ -23,14 +23,21 @@ export class Transaction {
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: [true],
+    required: [false],
   })
-  accountReceiver: User | mongoose.Types.ObjectId;
+  accountReceiver?: User | mongoose.Types.ObjectId | null;
 
-  @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'User', required: [true] })
-  accountSender: User | mongoose.Types.ObjectId;
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    required: [false],
+  })
+  accountSender?: User | mongoose.Types.ObjectId | null;
 
   createdAt?: string;
+
+  @Prop({ type: String, required: [true] })
+  secondUserEmail: string;
 }
 
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);

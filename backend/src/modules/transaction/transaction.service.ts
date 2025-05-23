@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 
 import { InjectModel } from '@nestjs/mongoose';
@@ -9,32 +9,105 @@ import { Transaction, TransactionDocument } from './schemas/transaction.schema';
 import { NotificationService } from '../notification/notification.service';
 import { TransactionType } from 'src/common/enums/transaction-type.enum';
 
+import { UserService } from '../user/user.service';
+
 @Injectable()
 export class TransactionService {
   constructor(
     @InjectModel(Transaction.name)
     private transactionModel: Model<TransactionDocument>,
     private readonly notificationService: NotificationService,
+    private readonly userService: UserService,
   ) {}
+
+  async handleSendLimitExtendedNotification(userId: string): Promise<void> {
+    try {
+      const user = await this.userService.findOneById(userId);
+
+      if (!user) {
+        console.error('User not found');
+        return;
+      }
+
+      const spend = await this.spend(userId);
+      const spendLimit = user.limit;
+
+      if (spend.totalAmount > spendLimit) {
+        await this.notificationService.createNotification({
+          message: `Your spend limit has been exceeded! Please check your account to see the details.`,
+          title: `Spend limit extended`,
+          seen: false,
+          userId,
+        });
+        return;
+      }
+    } catch (error) {
+      console.error('Error sending notification:', error);
+    }
+  }
 
   async create(
     userId: string,
     userEmail: string,
     createTransactionDto: CreateTransactionDto,
   ): Promise<TransactionDocument> {
-    const createdTransaction = new this.transactionModel({
-      ...createTransactionDto,
-      accountSender: userId,
-    });
+    let secondUserId = createTransactionDto.accountReceiver;
+    let secondUserEmail = createTransactionDto.secondUserEmail;
+
+    if (!secondUserId) {
+      try {
+        secondUserId = (
+          await this.userService.findOneByEmail(
+            createTransactionDto.secondUserEmail,
+          )
+        )._id as string;
+      } catch {}
+    }
+
+    if (!secondUserEmail) {
+      try {
+        secondUserEmail = (await this.userService.findOneById(secondUserId))
+          .email;
+      } catch {}
+    }
+
+    if (userEmail === secondUserEmail) {
+      throw new BadRequestException(
+        'You cannot send money to yourself using the second user email',
+      );
+    }
+
+    let createdTransaction: TransactionDocument;
+
+    if (createTransactionDto.type === TransactionType.INCOME) {
+      createdTransaction = new this.transactionModel({
+        ...createTransactionDto,
+        accountSender: secondUserId,
+        accountReceiver: userId,
+        secondUserEmail: secondUserEmail,
+      });
+    } else {
+      createdTransaction = new this.transactionModel({
+        ...createTransactionDto,
+        accountSender: userId,
+        accountReceiver: secondUserId,
+        secondUserEmail: secondUserEmail,
+      });
+    }
 
     const newTransaction = await createdTransaction.save();
 
-    await this.notificationService.createNotification({
-      message: `User ${userEmail} has sent you ${newTransaction.amount} ${newTransaction.currency}`,
-      title: `New transaction received from ${userEmail}`,
-      seen: false,
-      userId: newTransaction.accountReceiver._id.toString(),
-    });
+    // If user is sending money to himself, skip
+    if (createTransactionDto.type !== TransactionType.INCOME) {
+      await this.notificationService.createNotification({
+        message: `User ${userEmail} has sent you ${newTransaction.amount} ${newTransaction.currency}`,
+        title: `New transaction received from ${userEmail}`,
+        seen: false,
+        userId: newTransaction.accountReceiver._id.toString(),
+      });
+    }
+
+    await this.handleSendLimitExtendedNotification(userId);
 
     return newTransaction;
   }
@@ -46,6 +119,7 @@ export class TransactionService {
       .find({
         $or: [{ accountReceiver: userId }, { accountSender: userId }],
       })
+      .populate('accountReceiver', 'email')
       .exec();
   }
 
@@ -110,6 +184,31 @@ export class TransactionService {
 
     return {
       data,
+    };
+  }
+
+  async spend(userId: string) {
+    const spendThisMonth = await this.transactionModel.aggregate([
+      {
+        $match: {
+          accountSender: new Types.ObjectId(userId),
+          createdAt: {
+            $gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+          },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalAmount: { $sum: '$amount' },
+        },
+      },
+    ]);
+
+    const totalAmount = spendThisMonth[0]?.totalAmount || 0;
+
+    return {
+      totalAmount,
     };
   }
 }

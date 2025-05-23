@@ -32,7 +32,8 @@ export interface CreateTransactionDto {
   type: TransactionType;
   description: string;
   category: TransactionCategory;
-  accountReceiver: string;
+  accountReceiver?: string;
+  secondUserEmail?: string;
 }
 
 export interface TransactionResponse {
@@ -48,6 +49,7 @@ export interface TransactionResponse {
   createdAt: string;
   /** @format date-time */
   updatedAt: string;
+  secondAccountEmail: string;
   __v: number;
 }
 
@@ -141,6 +143,16 @@ export interface TransactionGraphItem {
 
 export interface TransactionGraphResponse {
   data: TransactionGraphItem[];
+}
+
+export interface SpendResponse {
+  spend: number;
+  target: number;
+  currency: TransactionCurrency;
+}
+
+export interface NewSpendLimitDto {
+  limit: number;
 }
 
 export type QueryParamsType = Record<string | number, any>;
@@ -624,6 +636,45 @@ export class Api<
         method: "GET",
         query: query,
         secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Widget
+     * @name WidgetControllerSpend
+     * @request GET:/api/spend
+     * @secure
+     */
+    widgetControllerSpend: (params: RequestParams = {}) =>
+      this.request<SpendResponse, void>({
+        path: `/api/spend`,
+        method: "GET",
+        secure: true,
+        format: "json",
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @tags Widget
+     * @name WidgetControllerSetSpendLimit
+     * @request PUT:/api/spend
+     * @secure
+     */
+    widgetControllerSetSpendLimit: (
+      data: NewSpendLimitDto,
+      params: RequestParams = {},
+    ) =>
+      this.request<GetMeResponse, void>({
+        path: `/api/spend`,
+        method: "PUT",
+        body: data,
+        secure: true,
+        type: ContentType.Json,
         format: "json",
         ...params,
       }),

@@ -3,6 +3,7 @@ import {
   type UseQueryOptions,
   useMutation,
   useQuery,
+  useQueryClient,
 } from "@tanstack/react-query";
 import type {
   CreateTransactionDto,
@@ -23,24 +24,33 @@ export type UseAppMutationOptions<TVariables = object, TData = object> = Omit<
 >;
 
 export const useGetTransactions = (
-  options?: UseAppQueryOptions<TransactionListResponse>,
+  options?: UseAppQueryOptions<TransactionListResponse>
 ) => {
   return useQuery({
     ...options,
     queryKey: [QueryKey.Transaction, "list"],
     queryFn: async () => {
-      return apiClient.api.transactionControllerFindAll({});
+      return apiClient.api.transactionControllerFindAll();
     },
   });
 };
 
 export const useCreateTransaction = (
-  options?: UseAppMutationOptions<CreateTransactionDto, TransactionResponse>,
+  options?: UseAppMutationOptions<CreateTransactionDto, TransactionResponse>
 ) => {
+  const queryClient = useQueryClient();
+
   return useMutation({
     ...options,
     mutationFn: async (data: CreateTransactionDto) => {
       return apiClient.api.transactionControllerCreate(data);
+    },
+    onSuccess: (...args) => {
+      queryClient.invalidateQueries({
+        queryKey: [QueryKey.Transaction, "list"],
+      });
+
+      options?.onSuccess?.(...args);
     },
   });
 };

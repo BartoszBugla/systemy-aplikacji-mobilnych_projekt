@@ -23,7 +23,10 @@ const resources = {
       "form.description": "Description",
       "form.category": "Category",
       "form.receiver": "Receiver",
+      "form.sender": "Sender",
+      "form.secondUserEmail": "Second user email",
 
+      "form.clear": "Clear",
       // Transaction Form
       "transaction.addNew": "Add new transaction",
       "transaction.selectCurrency": "Select currency",
@@ -49,9 +52,10 @@ const resources = {
       "validation.amountPositive": "Amount must be positive",
       "validation.descriptionRequired": "Description is required",
       "validation.receiverRequired": "Account receiver is required",
+      "validation.secondUserEmail": "Please enter different email address",
 
       // Dashboard
-      "dashboard.totalRevenue": "Total Revenue",
+      "dashboard.totalRevenue": "Total Balance",
       "dashboard.trendingUp": "Trending up this month",
       "dashboard.configureSettings": "Configure settings",
       "dashboard.pushNotifications":
@@ -76,9 +80,25 @@ const resources = {
       "header.toggleTheme": "Toggle theme",
       "header.toggleSidebar": "Toggle sidebar",
 
+      // Notifications
+      "notifications.empty": "No notifications",
+
       // Transaction list
       "transactionList.searchPlaceholder": "Search by description...",
       "transactionList.addTransaction": "Add Transaction",
+      "transactionList.title": "Transaction List",
+      "transactionList.date": "Date",
+      "transactionList.receiverSender": "Receiver/Sender",
+
+      // Budget Widget
+      "budget.spendingLimit": "Your spending limit",
+      "budget.setNewLimit": "Set new limit",
+      "budget.monthlySpend": "This month you spent",
+      "budget.from": "from",
+      "budget.submitButton": "Submit",
+      "budget.invalidAmount": "Please enter a valid number",
+
+      "form.submit": "Submit",
     },
   },
   pl: {
@@ -102,6 +122,8 @@ const resources = {
       "form.description": "Opis",
       "form.category": "Kategoria",
       "form.receiver": "Odbiorca",
+      "form.sender": "Nadawca",
+      "form.secondUserEmail": "Email drugiego użytkownika",
 
       // Transaction Form
       "transaction.addNew": "Dodaj nową transakcję",
@@ -128,9 +150,10 @@ const resources = {
       "validation.amountPositive": "Kwota musi być dodatnia",
       "validation.descriptionRequired": "Opis jest wymagany",
       "validation.receiverRequired": "Odbiorca jest wymagany",
+      "validation.secondUserEmail": "Proszę wprowadzić inny adres email",
 
       // Dashboard
-      "dashboard.totalRevenue": "Całkowity przychód",
+      "dashboard.totalRevenue": "Całkowity balans",
       "dashboard.trendingUp": "Wzrost w tym miesiącu",
       "dashboard.configureSettings": "Konfiguracja ustawień",
       "dashboard.pushNotifications":
@@ -155,9 +178,26 @@ const resources = {
       "header.toggleTheme": "Przełącz motyw",
       "header.toggleSidebar": "Przełącz pasek boczny",
 
+      // Notifications
+      "notifications.empty": "Brak powiadomień",
+
       // Transaction list
       "transactionList.searchPlaceholder": "Szukaj po opisie...",
       "transactionList.addTransaction": "Dodaj transakcję",
+      "transactionList.title": "Lista transakcji",
+      "transactionList.date": "Data",
+      "transactionList.receiverSender": "Odbiorca/Nadawca",
+
+      // Budget Widget
+      "budget.spendingLimit": "Twój limit wydatków",
+      "budget.setNewLimit": "Ustaw nowy limit",
+      "budget.monthlySpend": "W tym miesiącu wydałeś",
+      "budget.from": "z",
+      "budget.submitButton": "Wyślij",
+      "budget.invalidAmount": "Proszę wprowadzić prawidłową liczbę",
+
+      "form.clear": "Wyczyść",
+      "form.submit": "Akceptuj",
     },
   },
 };

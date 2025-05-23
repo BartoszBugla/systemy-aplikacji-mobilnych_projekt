@@ -18,6 +18,9 @@ export class User extends Document {
   @Prop()
   lastName?: string;
 
+  @Prop({ default: null, type: Number })
+  limit?: number | null;
+
   @Prop({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'PushSubscriptionModel',

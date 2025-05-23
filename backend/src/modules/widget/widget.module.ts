@@ -3,8 +3,10 @@ import { WidgetService } from './widget.service';
 import { WidgetController } from './widget.controller';
 import { TransactionModule } from '../transaction/transaction.module';
 
+import { UserModule } from '../user/user.module';
+
 @Module({
-  imports: [TransactionModule],
+  imports: [TransactionModule, UserModule],
   controllers: [WidgetController],
   providers: [WidgetService],
 })

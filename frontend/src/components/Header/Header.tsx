@@ -12,6 +12,10 @@ export const Header = () => {
   const { theme, setTheme } = useTheme();
   const { data: notifications } = useGetNotifications();
 
+  const newNotifications = (notifications?.data || []).filter(
+    (notification) => !notification.seen
+  );
+
   return (
     <header className="flex h-16 items-center gap-4 border-b px-4">
       <SidebarTrigger aria-label={t("header.toggleSidebar")} />
@@ -33,9 +37,9 @@ export const Header = () => {
           className="relative"
         >
           <BellIcon className="h-5 w-5" />
-          {notifications?.data.length ? (
+          {newNotifications.length ? (
             <span className="absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] text-primary-foreground">
-              {notifications.data.length}
+              {newNotifications.length}
             </span>
           ) : null}
         </Button>

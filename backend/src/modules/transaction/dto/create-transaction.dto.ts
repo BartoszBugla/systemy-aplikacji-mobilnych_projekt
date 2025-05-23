@@ -1,8 +1,8 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { TransactionCurrency } from 'src/common/enums/transaction-currency.enum';
 import { TransactionCategory } from 'src/common/enums/transaction-category.enum';
 import { TransactionType } from 'src/common/enums/transaction-type.enum';
-import { IsEnum, IsNumber, IsString } from 'class-validator';
+import { IsEnum, IsNumber, IsOptional, IsString } from 'class-validator';
 
 export class CreateTransactionDto {
   @ApiProperty()
@@ -34,7 +34,13 @@ export class CreateTransactionDto {
   @IsEnum(TransactionCategory)
   category: TransactionCategory;
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsString()
+  @IsOptional()
   accountReceiver: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  secondUserEmail?: string;
 }

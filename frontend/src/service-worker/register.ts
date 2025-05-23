@@ -20,8 +20,7 @@ export const initializePush = async () => {
   const subscription = await swRegistration.pushManager.getSubscription();
 
   if (!subscription) {
-    const vapidPublicKey =
-      "BGMtpZEa7G1Lo48R69MoSOe0nfoDiFrwygvYrl0rtQm1ctvapWXlnMCwhVMnbhur9EUcde9EvsxzERzF7fonEMk";
+    const vapidPublicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY || "";
 
     const convertedVapidKey = urlBase64ToUint8Array(vapidPublicKey);
 

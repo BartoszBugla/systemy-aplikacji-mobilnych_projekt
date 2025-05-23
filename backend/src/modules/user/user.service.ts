@@ -32,4 +32,13 @@ export class UserService {
 
     return createdUserModel.save();
   }
+
+  async setSpendLimit(
+    userId: string,
+    newSpendLimit: number,
+  ): Promise<UserDocument> {
+    return await this.userModel.findByIdAndUpdate(userId, {
+      limit: newSpendLimit,
+    });
+  }
 }
